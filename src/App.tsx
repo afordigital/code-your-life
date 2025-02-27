@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { createClient, type Session } from "@supabase/supabase-js";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { Auth } from "@supabase/auth-ui-react";
 import "./App.css";
 
 const projectUrl: string = import.meta.env.VITE_PROJECT_URL;
