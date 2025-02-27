@@ -35,18 +35,31 @@ function App() {
     if (error) console.error("Error al iniciar sesión:", error.message);
   };
 
-  //   if (!session) {
-  //     return <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />;
-  //   }
+  async function signOut() {
+    const { error } = await supabase.auth.signOut();
+    console.error(error);
+  }
 
+  //     return <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />;
+  if (!session) {
+    return (
+      <button type="button" onClick={signInWithGoogle}>
+        Iniciar sesión con Google
+      </button>
+    );
+  }
   return (
-    <div>
-      {!session && (
-        <button type="button" onClick={signInWithGoogle}>
-          Iniciar sesión con Google
+    <main className="flex flex-col items-center justify-center h-screen min-h-full">
+      <section className="bg-blue-500 grow">
+        <button type="button">Click me</button>
+      </section>
+      <footer className="h-[200px] bg-red-500">
+        Estás logeado
+        <button type="button" onClick={signOut}>
+          Log Out
         </button>
-      )}
-    </div>
+      </footer>
+    </main>
   );
 }
 
