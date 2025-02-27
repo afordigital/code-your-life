@@ -6,9 +6,12 @@ const projectUrl: string = import.meta.env.VITE_PROJECT_URL;
 const apiKey: string = import.meta.env.VITE_API_KEY;
 
 export const supabase = createClient(projectUrl, apiKey);
+const LIFE_HISTORY_TABLE = "life_history";
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [text, setText] = useState("");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -48,13 +51,61 @@ function App() {
       </button>
     );
   }
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const { error } = await supabase
+      .from(LIFE_HISTORY_TABLE)
+      .insert({ event_text: text });
+
+    console.error(error);
+  };
+
+  console.log(text);
   return (
-    <main className="flex flex-col items-center justify-center h-screen min-h-full">
-      <section className="bg-blue-500 grow">
-        <button type="button">Click me</button>
+    <main className="flex flex-col items-center justify-center h-screen min-h-full gap-8 py-20">
+      <section className="max-w-6xl mx-auto grow">
+        <dialog open={isOpen}>
+          <section className="flex flex-col w-full gap-4 align-items justify-content">
+            <h1>This is a form</h1>
+            <label htmlFor="text">
+              Text
+              <input
+                name="text"
+                id="text"
+                type="text"
+                value={text}
+                onChange={(event) => {
+                  setText(event.target.value);
+                }}
+                placeholder="Enter a text..."
+              />
+            </label>
+            <label htmlFor="text">
+              Upload an image
+              <input
+                name="text"
+                id="text"
+                type="file"
+                placeholder="Upload an image"
+              ></input>
+            </label>
+            <button className="p-4 bg-green-500" onClick={handleSubmit}>
+              Save changes
+            </button>
+          </section>
+        </dialog>
+        <button
+          type="button"
+          className="border-2 border-red w-[300px] h-[300px] hover:bg-slate-200"
+          onClick={() => {
+            setIsOpen(!isOpen);
+          }}
+        >
+          Click me
+        </button>
       </section>
-      <footer className="h-[200px] bg-red-500">
-        Estás logeado
+      <footer className="max-w-6xl mx-auto">
         <button type="button" onClick={signOut}>
           Log Out
         </button>
