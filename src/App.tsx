@@ -1,69 +1,82 @@
 import { useEffect, useState } from "react";
-import { createClient, type Session } from "@supabase/supabase-js";
 import "./App.css";
+import { apiClient } from "./utils/api";
+import { useAuth } from "./hooks/useAuth";
+import { InsertLifeHistory, useCreateLifeHistory } from "./services/lifeHistory";
+import { useGetCurrentUser } from "./services/user";
+import { CurrentUser } from "./types";
 
-const projectUrl: string = import.meta.env.VITE_PROJECT_URL;
-const apiKey: string = import.meta.env.VITE_API_KEY;
-
-export const supabase = createClient(projectUrl, apiKey);
-const LIFE_HISTORY_TABLE = "life_history";
 
 function App() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [text, setText] = useState("");
+  const getCurrentUser = useGetCurrentUser();
+  const { signInWithGoogle, signOut } = useAuth();
+  const createLifeHistory = useCreateLifeHistory();
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
+  const handleCreateLifeHistory = async () => {
+    if (createLifeHistory.isPending) return
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+    if (!currentUser) {
+      console.error("User is not authenticated");
+      return;
+    }
+    
+    const newLifeHistory: InsertLifeHistory = {
+      event_text: text,
+      user_id: currentUser?.id,
+      // rest of the fields:
+      // event_date,
+      // event_image,
+    }
 
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const signInWithGoogle = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: "https://hckzsirtpkhuupdqcfia.supabase.co/auth/v1/callback",
-      },
-    });
-
-    if (error) console.error("Error al iniciar sesión:", error.message);
+    createLifeHistory.mutate(newLifeHistory);
   };
 
-  async function signOut() {
-    const { error } = await supabase.auth.signOut();
-    console.error(error);
-  }
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = apiClient.auth.onAuthStateChange((_event, session) => {
 
-  //     return <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />;
-  if (!session) {
+      if (session?.user.id) {
+        try {
+          getCurrentUser.mutateAsync(session.user.id).then((user) => {
+            if (user) setCurrentUser(user);
+          });
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    }
+  }, []);
+
+
+  if (!currentUser) {
     return (
       <button type="button" onClick={signInWithGoogle}>
-        Iniciar sesión con Google
+        {
+          getCurrentUser.isPending ? "Loading..." : 'Iniciar sesión con Google'
+        }
       </button>
     );
   }
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    const { error } = await supabase
-      .from(LIFE_HISTORY_TABLE)
-      .insert({ event_text: text });
-
-    console.error(error);
-  };
-
-  console.log(text);
   return (
     <main className="flex flex-col items-center justify-center h-screen min-h-full gap-8 py-20">
+
+      <header className="max-w-6xl mx-auto">
+        <div className="flex gap-3">
+          <h1>Welcome, {currentUser.name}</h1>
+          <img src={currentUser.avatar_url} alt={currentUser.name} className="w-12 h-12 rounded-full" />
+        </div>
+
+      </header>
+
       <section className="max-w-6xl mx-auto grow">
         <dialog open={isOpen}>
           <section className="flex flex-col w-full gap-4 align-items justify-content">
@@ -90,11 +103,22 @@ function App() {
                 placeholder="Upload an image"
               ></input>
             </label>
-            <button className="p-4 bg-green-500" onClick={handleSubmit}>
+            <button className="p-4 bg-green-500" onClick={handleCreateLifeHistory}>
               Save changes
             </button>
           </section>
         </dialog>
+
+        {
+          createLifeHistory.isPending ? (
+            <p>Loading...</p>
+          ) : createLifeHistory.isError ? (
+            <p>Error: {createLifeHistory.error.message}</p>
+          ) : createLifeHistory.isSuccess ? (
+            <p>Success</p>
+          ) : null
+        }
+
         <button
           type="button"
           className="border-2 border-red w-[300px] h-[300px] hover:bg-slate-200"

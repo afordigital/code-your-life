@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { Database } from "../database.types";
 
 const projectUrl: string = import.meta.env.VITE_PROJECT_URL;
 const apiKey: string = import.meta.env.VITE_API_KEY;
@@ -9,4 +10,4 @@ if (!projectUrl || !apiKey) {
 	);
 }
 
-export const apiClient = createClient(projectUrl, apiKey);
+export const apiClient = createClient<Database>(projectUrl, apiKey);
