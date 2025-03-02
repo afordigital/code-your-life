@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { apiClient } from "../utils/api"
 import { Database } from "../database.types"
+import { InsertLifeHistory } from "../types"
 
 
 export function useGetUserLifeHistories() {
@@ -20,7 +21,6 @@ export function useGetUserLifeHistories() {
   })
 }
 
-export type InsertLifeHistory = Database["public"]["Tables"]["life_history"]["Insert"]
 export function useCreateLifeHistory() {
   return useMutation({
     mutationFn: async ({

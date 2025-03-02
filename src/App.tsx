@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { apiClient } from "./utils/api";
 import { useAuth } from "./hooks/useAuth";
-import { InsertLifeHistory, useCreateLifeHistory } from "./services/lifeHistory";
+import { useCreateLifeHistory } from "./services/lifeHistory";
 import { useGetCurrentUser } from "./services/user";
-import { CurrentUser } from "./types";
+import { CurrentUser, InsertLifeHistory } from "./types";
 
 
 function App() {
