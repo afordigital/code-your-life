@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { apiClient } from "./utils/api";
 import { useAuth } from "./hooks/useAuth";
-import { useCreateLifeHistory } from "./services/lifeHistory";
+import { useCreateLifeHistory, useDeleteLifeHistory, useGetUserLifeHistories } from "./services/lifeHistory";
 import { useGetCurrentUser } from "./services/user";
 import { CurrentUser, InsertLifeHistory } from "./types";
 
@@ -11,8 +11,10 @@ function App() {
   const [text, setText] = useState("");
   const getCurrentUser = useGetCurrentUser();
   const { signInWithGoogle, signOut } = useAuth();
+  const deleteLifeHistory = useDeleteLifeHistory();
   const createLifeHistory = useCreateLifeHistory();
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const getUserLifeHistories = useGetUserLifeHistories();
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 
   const handleCreateLifeHistory = async () => {
@@ -22,7 +24,7 @@ function App() {
       console.error("User is not authenticated");
       return;
     }
-    
+
     const newLifeHistory: InsertLifeHistory = {
       event_text: text,
       user_id: currentUser?.id,
@@ -74,15 +76,67 @@ function App() {
           <h1>Welcome, {currentUser.name}</h1>
           <img src={currentUser.avatar_url} alt={currentUser.name} className="w-12 h-12 rounded-full" />
         </div>
-
       </header>
 
-      <section className="max-w-6xl mx-auto grow">
-        <dialog open={isOpen}>
-          <section className="flex flex-col w-full gap-4 align-items justify-content">
-            <h1>This is a form</h1>
+
+      <section className="max-w-6xl w-full mx-auto flex flex-col gap-4 flex-1 items-center">
+        {
+          createLifeHistory.isPending ? (
+            <p>Loading...</p>
+          ) : createLifeHistory.isError ? (
+            <p>Error: {createLifeHistory.error.message}</p>
+          ) : null
+        }
+
+        {
+          deleteLifeHistory.isPending ? (
+            <p>Loading...</p>
+          ) : deleteLifeHistory.isError ? (
+            <p>Error: {deleteLifeHistory.error.message}</p>
+          ) : null
+        }
+
+        <h2 className="font-bold">Your life histories:</h2>
+        {
+          getUserLifeHistories.isPending ? (
+            <p>Loading...</p>
+          ) : getUserLifeHistories.isError ? (
+            <p>Error: {getUserLifeHistories.error.message}</p>
+          ) : getUserLifeHistories.isSuccess ? (
+            <ul className="list-disc">
+              {
+                getUserLifeHistories?.data?.map((lifeHistory) => (
+                  <li key={lifeHistory.id} className="flex gap-1">
+                    <p>{lifeHistory.event_text}</p>
+                    <button onClick={() => {
+                      deleteLifeHistory.mutate(lifeHistory.id)
+                    }}
+                      className="text-red-500"
+                    >
+                      Delete
+                    </button>
+                  </li>
+                ))
+              }
+            </ul>
+          ) : null
+        }
+
+
+        <button
+          type="button"
+          className="border-2 border-red w-max hover:bg-slate-200 px-10 py-2"
+          onClick={() => {
+            setIsOpen(!isOpen);
+          }}
+        >
+          {isOpen ? "Close" : "Create a new life history"}
+        </button>
+
+        {!!isOpen && <section>
+          <section className="flex flex-col w-full gap-4 align-items justify-content mt-10">
             <label htmlFor="text">
-              Text
+              Life history text:
               <input
                 name="text"
                 id="text"
@@ -101,33 +155,15 @@ function App() {
                 id="text"
                 type="file"
                 placeholder="Upload an image"
-              ></input>
+              />
             </label>
-            <button className="p-4 bg-green-500" onClick={handleCreateLifeHistory}>
-              Save changes
+            <button className="p-4 bg-green-500" onClick={handleCreateLifeHistory} disabled={createLifeHistory.isPending}>
+              {
+                createLifeHistory.isPending ? "Loading..." : "Create"
+              }
             </button>
           </section>
-        </dialog>
-
-        {
-          createLifeHistory.isPending ? (
-            <p>Loading...</p>
-          ) : createLifeHistory.isError ? (
-            <p>Error: {createLifeHistory.error.message}</p>
-          ) : createLifeHistory.isSuccess ? (
-            <p>Success</p>
-          ) : null
-        }
-
-        <button
-          type="button"
-          className="border-2 border-red w-[300px] h-[300px] hover:bg-slate-200"
-          onClick={() => {
-            setIsOpen(!isOpen);
-          }}
-        >
-          Click me
-        </button>
+        </section>}
       </section>
       <footer className="max-w-6xl mx-auto">
         <button type="button" onClick={signOut}>

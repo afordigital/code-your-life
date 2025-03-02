@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { apiClient } from "../utils/api"
 import { Database } from "../database.types"
 import { InsertLifeHistory } from "../types"
+import { queryClient } from "../main"
 
 
 export function useGetUserLifeHistories() {
@@ -49,6 +50,9 @@ export function useCreateLifeHistory() {
       }
       return data
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["lifeHistories"] })
+    }
   })
 }
 
@@ -80,8 +84,11 @@ export function useUpdateLifeHistory() {
       if (error) {
         throw new Error(error.message)
       }
-      return data 
+      return data
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["lifeHistories"] })
+    }
   })
 }
 
@@ -92,7 +99,10 @@ export function useDeleteLifeHistory() {
       if (error) {
         throw new Error(error.message)
       }
-      return data 
+      return data
     },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["lifeHistories"] })
+    }
   })
 }
