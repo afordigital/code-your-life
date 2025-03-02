@@ -34,6 +34,7 @@ function App() {
     }
 
     createLifeHistory.mutate(newLifeHistory);
+    setText("");
   };
 
   useEffect(() => {
