@@ -12,6 +12,10 @@ import type { CurrentUser, InsertLifeHistory } from "./types";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { Modal } from "./components/Modal";
+import { TitleSelector } from "./components/TitleSelector";
+
+export type LifeUnit = "life" | "year" | "month";
+export type TimeUnit = "years" | "months" | "weeks";
 
 function App() {
 	const [text, setText] = useState("");
@@ -22,6 +26,8 @@ function App() {
 	const [isOpen, setIsOpen] = useState<boolean>(false);
 	const getUserLifeHistories = useGetUserLifeHistories();
 	const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+	const [lifeUnit, setLifeUnit] = useState<LifeUnit>("life");
+	const [timeUnit, setTimeUnit] = useState<TimeUnit>("years");
 
 	const handleCreateLifeHistory = async () => {
 		if (createLifeHistory.isPending) return;
@@ -71,6 +77,34 @@ function App() {
 		);
 	}
 
+	const generateGrid = () => {
+		let cells: number[] = [];
+
+		if (lifeUnit === "life") {
+			cells = Array.from({ length: 100 }, (_, i) => i + 1); // 1 a 100 años
+		} else if (lifeUnit === "year") {
+			cells =
+				timeUnit === "months"
+					? Array.from({ length: 12 }, (_, i) => i + 1)
+					: Array.from({ length: 52 }, (_, i) => i + 1); // Meses o semanas
+		} else if (lifeUnit === "month") {
+			cells = Array.from({ length: 4 }, (_, i) => i + 1); // 4 semanas
+		}
+
+		return (
+			<div className="grid grid-cols-10 gap-2 mt-4">
+				{cells.map((cell) => (
+					<div
+						key={cell}
+						className="border p-2 text-center rounded bg-gray-100"
+					>
+						{cell}
+					</div>
+				))}
+			</div>
+		);
+	};
+
 	return (
 		<main className="flex flex-col items-center justify-center h-screen min-h-full gap-8 py-20">
 			<Header currentUser={currentUser} />
@@ -88,7 +122,14 @@ function App() {
 					<p>Error: {deleteLifeHistory.error.message}</p>
 				) : null}
 
-				<h2 className="font-bold">Your life histories:</h2>
+				<TitleSelector
+					lifeUnit={lifeUnit}
+					setLifeUnit={setLifeUnit}
+					timeUnit={timeUnit}
+					setTimeUnit={setTimeUnit}
+				/>
+				{generateGrid()}
+
 				{getUserLifeHistories.isPending ? (
 					<p>Loading...</p>
 				) : getUserLifeHistories.isError ? (
