@@ -8,46 +8,47 @@ import {
 	useGetUserLifeHistories,
 } from "./services/lifeHistory";
 import { useGetCurrentUser } from "./services/user";
-import type { CurrentUser, InsertLifeHistory } from "./types";
+import type { CurrentUser } from "./types";
+// import type { InsertLifeHistory } from "./types";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
-import { Modal } from "./components/Modal";
+// import { Modal } from "./components/Modal";
 import { TitleSelector } from "./components/TitleSelector";
 
 export type LifeUnit = "life" | "year" | "month";
 export type TimeUnit = "years" | "months" | "weeks";
 
 function App() {
-	const [text, setText] = useState("");
+	// const [text, setText] = useState("");
 	const getCurrentUser = useGetCurrentUser();
 	const { signInWithGoogle, signOut } = useAuth();
 	const deleteLifeHistory = useDeleteLifeHistory();
 	const createLifeHistory = useCreateLifeHistory();
-	const [isOpen, setIsOpen] = useState<boolean>(false);
+	// const [isOpen, setIsOpen] = useState<boolean>(false);
 	const getUserLifeHistories = useGetUserLifeHistories();
 	const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 	const [lifeUnit, setLifeUnit] = useState<LifeUnit>("life");
 	const [timeUnit, setTimeUnit] = useState<TimeUnit>("years");
 
-	const handleCreateLifeHistory = async () => {
-		if (createLifeHistory.isPending) return;
+	// const handleCreateLifeHistory = async () => {
+	// 	if (createLifeHistory.isPending) return;
 
-		if (!currentUser) {
-			console.error("User is not authenticated");
-			return;
-		}
+	// 	if (!currentUser) {
+	// 		console.error("User is not authenticated");
+	// 		return;
+	// 	}
 
-		const newLifeHistory: InsertLifeHistory = {
-			event_text: text,
-			user_id: currentUser?.id,
-			// rest of the fields:
-			// event_date,
-			// event_image,
-		};
+	// 	const newLifeHistory: InsertLifeHistory = {
+	// 		event_text: text,
+	// 		user_id: currentUser?.id,
+	// 		// rest of the fields:
+	// 		// event_date,
+	// 		// event_image,
+	// 	};
 
-		createLifeHistory.mutate(newLifeHistory);
-		setText("");
-	};
+	// 	createLifeHistory.mutate(newLifeHistory);
+	// 	setText("");
+	// };
 
 	useEffect(() => {
 		const {
@@ -163,14 +164,14 @@ function App() {
 					{isOpen ? "Close" : "Create a new life history"}
 				</button> */}
 
-				{!!isOpen && (
+				{/* {!!isOpen && (
 					<Modal
 						text={text}
 						setText={setText}
 						handleCreateLifeHistory={handleCreateLifeHistory}
 						createLifeHistory={createLifeHistory}
 					/>
-				)}
+				)} */}
 			</section>
 			<Footer signOut={signOut} />
 		</main>
