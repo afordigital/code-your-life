@@ -21,8 +21,8 @@ export type TimeUnit = "years" | "months" | "weeks";
 function App() {
 	// const [text, setText] = useState("");
 	const {
-	 mutateAsync: getCurrentUser,
-	 isPending: getCurrentUserIsPending,
+	 mutateAsync: getUserAsync,
+	 isPending: getUserIsPending,
 	} = useGetCurrentUser();
 	const { signInWithGoogle, signOut } = useAuth();
 	const deleteLifeHistory = useDeleteLifeHistory();
@@ -43,7 +43,7 @@ function App() {
 
 	// 	const newLifeHistory: InsertLifeHistory = {
 	// 		event_text: text,
-	// 		user_id: currentUser?.id,
+	// 		user_id: currentUser.id,
 	// 		// rest of the fields:
 	// 		// event_date,
 	// 		// event_image,
@@ -59,7 +59,7 @@ function App() {
 		} = apiClient.auth.onAuthStateChange((_event, session) => {
 			if (session?.user.id) {
 				try {
-					getCurrentUser(session.user.id).then((user) => {
+					getUserAsync(session.user.id).then((user) => {
 						if (user) setCurrentUser(user);
 					});
 				} catch (error) {
@@ -71,12 +71,12 @@ function App() {
 		return () => {
 			subscription.unsubscribe();
 		};
-	}, [getCurrentUser]);
+	}, [getUserAsync]);
 
 	if (!currentUser) {
 		return (
 			<button type="button" onClick={signInWithGoogle}>
-				{getCurrentUserIsPending ? "Loading..." : "Iniciar sesión con Google"}
+				{getUserIsPending ? "Loading..." : "Iniciar sesión con Google"}
 			</button>
 		);
 	}
