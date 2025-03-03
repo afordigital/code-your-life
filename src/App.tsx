@@ -26,6 +26,7 @@ function App() {
 	const createLifeHistory = useCreateLifeHistory();
 	// const [isOpen, setIsOpen] = useState<boolean>(false);
 	const getUserLifeHistories = useGetUserLifeHistories();
+ const {mutateAsync: getUserAsync} = useGetCurrentUser();
 	const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
 	const [lifeUnit, setLifeUnit] = useState<LifeUnit>("life");
 	const [timeUnit, setTimeUnit] = useState<TimeUnit>("years");
@@ -56,7 +57,7 @@ function App() {
 		} = apiClient.auth.onAuthStateChange((_event, session) => {
 			if (session?.user.id) {
 				try {
-					getCurrentUser.mutateAsync(session.user.id).then((user) => {
+					getUserAsync(session.user.id).then((user) => {
 						if (user) setCurrentUser(user);
 					});
 				} catch (error) {
@@ -68,7 +69,7 @@ function App() {
 		return () => {
 			subscription.unsubscribe();
 		};
-	}, [getCurrentUser]);
+	}, [getUserAsync]);
 
 	if (!currentUser) {
 		return (
