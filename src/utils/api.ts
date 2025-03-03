@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { Database } from "../database.types";
+import type { Database } from "../database.types";
 
 const projectUrl: string = import.meta.env.VITE_PROJECT_URL;
 const apiKey: string = import.meta.env.VITE_API_KEY;
