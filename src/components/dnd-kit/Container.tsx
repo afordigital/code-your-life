@@ -12,9 +12,7 @@ const containerStyle = {
   flex: 1,
 };
 
-export const Container = (props) => {
-  const { id, items } = props;
-
+export const Container = ({ id, items }: { id: string; items: [] }) => {
   const { setNodeRef } = useDroppable({
     id,
   });
@@ -26,7 +24,7 @@ export const Container = (props) => {
       strategy={verticalListSortingStrategy}
     >
       <div ref={setNodeRef} style={containerStyle}>
-        {items?.map((id) => (
+        {items?.map((id: string) => (
           <SortableItem key={id} id={id} />
         ))}
       </div>

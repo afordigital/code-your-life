@@ -7,6 +7,9 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  DragStartEvent,
+  DragOverEvent,
+  DragEndEvent,
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { Container } from "./Container";
@@ -14,14 +17,14 @@ import { Item } from "./SortableItem";
 
 const wrapperStyle = {
   display: "flex",
-  flexDirection: "row",
+  FlexDirection: "row",
 };
 
 const defaultAnnouncements = {
-  onDragStart(id) {
+  onDragStart(id: string) {
     console.log(`Picked up draggable item ${id}.`);
   },
-  onDragOver(id, overId) {
+  onDragOver(id: string, overId: string) {
     if (overId) {
       console.log(
         `Draggable item ${id} was moved over droppable area ${overId}.`
@@ -31,7 +34,7 @@ const defaultAnnouncements = {
 
     console.log(`Draggable item ${id} is no longer over a droppable area.`);
   },
-  onDragEnd(id, overId) {
+  onDragEnd(id: string, overId: string) {
     if (overId) {
       console.log(
         `Draggable item ${id} was dropped over droppable area ${overId}`
@@ -41,7 +44,7 @@ const defaultAnnouncements = {
 
     console.log(`Draggable item ${id} was dropped.`);
   },
-  onDragCancel(id) {
+  onDragCancel(id: string) {
     console.log(`Dragging was cancelled. Draggable item ${id} was dropped.`);
   },
 };
@@ -76,7 +79,7 @@ export const DndContainer = ({ gridItems }) => {
     </div>
   );
 
-  function findContainer(id) {
+  function findContainer(id: string) {
     if (id in items) {
       return id;
     }
@@ -84,14 +87,14 @@ export const DndContainer = ({ gridItems }) => {
     return Object.keys(items).find((key) => items[key].includes(id));
   }
 
-  function handleDragStart(event) {
+  function handleDragStart(event: DragStartEvent) {
     const { active } = event;
     const { id } = active;
 
     setActiveId(id);
   }
 
-  function handleDragOver(event) {
+  function handleDragOver(event: DragOverEvent) {
     const { active, over, draggingRect } = event;
     const { id } = active;
     const { id: overId } = over;
@@ -124,7 +127,7 @@ export const DndContainer = ({ gridItems }) => {
         const isBelowLastItem =
           over &&
           overIndex === overItems.length - 1 &&
-          draggingRect?.offsetTop > over.rect.offsetTop + over.rect.height;
+          draggingRect?.offsetTop > over.rect?.offsetTop + over.rect.height;
 
         const modifier = isBelowLastItem ? 1 : 0;
 
@@ -145,7 +148,7 @@ export const DndContainer = ({ gridItems }) => {
     });
   }
 
-  function handleDragEnd(event) {
+  function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
     const { id } = active;
     const { id: overId } = over;
