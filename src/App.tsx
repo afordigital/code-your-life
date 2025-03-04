@@ -1,4 +1,4 @@
-import { Ref, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import { apiClient } from "./utils/api";
 import { useAuth } from "./hooks/useAuth";
@@ -14,10 +14,28 @@ import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 // import { Modal } from "./components/Modal";
 import { TitleSelector } from "./components/TitleSelector";
-import { createSwapy, Swapy, utils } from "swapy";
+import { DndContainer } from "./components/dnd-kit/DndContainer";
+// import { createSwapy, Swapy, utils } from "swapy";
 
 export type LifeUnit = "life" | "year" | "month";
 export type TimeUnit = "years" | "months" | "weeks";
+
+const generateGrid = () => {
+  let items = {
+    decade_1: Array.from({ length: 10 }, (_, i) => (i + 1).toString()),
+    decade_2: Array.from({ length: 10 }, (_, i) => (i + 11).toString()),
+    decade_3: Array.from({ length: 10 }, (_, i) => (i + 21).toString()),
+    decade_4: Array.from({ length: 10 }, (_, i) => (i + 31).toString()),
+    decade_5: Array.from({ length: 10 }, (_, i) => (i + 41).toString()),
+    decade_6: Array.from({ length: 10 }, (_, i) => (i + 51).toString()),
+    decade_7: Array.from({ length: 10 }, (_, i) => (i + 61).toString()),
+    decade_8: Array.from({ length: 10 }, (_, i) => (i + 71).toString()),
+    decade_9: Array.from({ length: 10 }, (_, i) => (i + 81).toString()),
+    decade_10: Array.from({ length: 10 }, (_, i) => (i + 91).toString()),
+  };
+
+  return items;
+};
 
 function App() {
   // const [text, setText] = useState("");
@@ -32,44 +50,7 @@ function App() {
   const [lifeUnit, setLifeUnit] = useState<LifeUnit>("life");
   const [timeUnit, setTimeUnit] = useState<TimeUnit>("years");
 
-  const generateGrid = (lifeUnit: LifeUnit, timeUnit: TimeUnit) => {
-    let cells: number[] = [];
-
-    if (lifeUnit === "life") {
-      cells = Array.from({ length: 100 }, (_, i) => i + 1); // 1 a 100 años
-    } else if (lifeUnit === "year") {
-      cells =
-        timeUnit === "months"
-          ? Array.from({ length: 12 }, (_, i) => i + 1)
-          : Array.from({ length: 52 }, (_, i) => i + 1); // Meses o semanas
-    } else if (lifeUnit === "month") {
-      cells = Array.from({ length: 4 }, (_, i) => i + 1); // 4 semanas
-    }
-
-    return cells;
-  };
-
-  let cells = generateGrid(lifeUnit, timeUnit);
-
-  const [slotItemMap, setSlotItemMap] = useState(
-    utils.initSlotItemMap(cells, "cellsId")
-  );
-  const slottedItems = useMemo(
-    () => utils.toSlottedItems(cells, "cellsId", slotItemMap),
-    [cells, slotItemMap]
-  );
-
-  useEffect(
-    () =>
-      utils.dynamicSwapy(
-        swapyRef.current,
-        cells,
-        "cellsId",
-        slotItemMap,
-        setSlotItemMap
-      ),
-    [cells]
-  );
+  let gridItems = generateGrid();
 
   // const handleCreateLifeHistory = async () => {
   // 	if (createLifeHistory.isPending) return;
@@ -90,18 +71,6 @@ function App() {
   // 	createLifeHistory.mutate(newLifeHistory);
   // 	setText("");
   // };
-  const swapyRef = useRef<Swapy | null>(null);
-  const containerRef = useRef<HTMLElement | null>(null);
-
-  useEffect(() => {
-    swapyRef.current = createSwapy(containerRef.current, {
-      manualSwap: true,
-    });
-
-    return () => {
-      swapyRef.current?.destroy();
-    };
-  }, []);
 
   useEffect(() => {
     const {
@@ -155,22 +124,16 @@ function App() {
           setTimeUnit={setTimeUnit}
         />
 
-        <section ref={containerRef} className="grid grid-cols-10 gap-2 mt-4">
-          {slottedItems.map((index, cell) => (
-            <div
-              key={cell}
-              className="p-2 text-center bg-gray-100 border"
-              data-swapy-slot={`cell-${index}`}
-            >
-              {index === 4 && (
-                <p className="bg-blue-500" data-swapy-item={`cell-${index}`}>
-                  content
-                </p>
-              )}
+        {/* <section className="grid grid-cols-10 gap-2 mt-4">
+          {cells.map((index, cell) => (
+            <div key={cell} className="p-2 text-center bg-gray-100 border">
+              {index === 4 && <p className="bg-blue-500">content</p>}
               {cell}
             </div>
           ))}
-        </section>
+        </section> */}
+
+        <DndContainer gridItems={gridItems}></DndContainer>
 
         {getUserLifeHistories.isPending ? (
           <p>Loading...</p>
