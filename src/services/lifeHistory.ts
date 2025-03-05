@@ -1,9 +1,8 @@
-import { useMutation, useQuery } from "@tanstack/react-query"
-import { apiClient } from "../utils/api"
-import { Database } from "../database.types"
-import { InsertLifeHistory } from "../types"
-import { queryClient } from "../main"
-
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { apiClient } from "../utils/api";
+import { Database } from "../database.types";
+import { InsertLifeHistory } from "../types";
+import { queryClient } from "../main";
 
 export function useGetUserLifeHistories() {
   return useQuery({
@@ -11,15 +10,18 @@ export function useGetUserLifeHistories() {
     queryFn: async () => {
       const {
         data: { session },
-      } = await apiClient.auth.getSession()
+      } = await apiClient.auth.getSession();
       if (!session?.user.id) {
-        throw new Error("User is not authenticated")
+        throw new Error("User is not authenticated");
       }
 
-      const lifeHistories = await apiClient.from("life_history").select("*").eq("user_id", session?.user.id)
-      return lifeHistories.data
+      const lifeHistories = await apiClient
+        .from("life_history")
+        .select("*")
+        .eq("user_id", session?.user.id);
+      return lifeHistories.data;
     },
-  })
+  });
 }
 
 export function useCreateLifeHistory() {
@@ -33,9 +35,9 @@ export function useCreateLifeHistory() {
     }: InsertLifeHistory) => {
       const {
         data: { session },
-      } = await apiClient.auth.getSession()
+      } = await apiClient.auth.getSession();
       if (!session?.user.id) {
-        throw new Error("User is not authenticated")
+        throw new Error("User is not authenticated");
       }
 
       const { data, error } = await apiClient.from("life_history").insert({
@@ -43,17 +45,17 @@ export function useCreateLifeHistory() {
         event_image,
         event_text,
         updated_at,
-        user_id
-      })
+        user_id,
+      });
       if (error) {
-        throw new Error(error.message)
+        throw new Error(error.message);
       }
-      return data
+      return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["lifeHistories"] })
-    }
-  })
+      queryClient.invalidateQueries({ queryKey: ["lifeHistories"] });
+    },
+  });
 }
 
 export function useUpdateLifeHistory() {
@@ -68,9 +70,9 @@ export function useUpdateLifeHistory() {
     }: Database["public"]["Tables"]["life_history"]["Update"]) => {
       const {
         data: { session },
-      } = await apiClient.auth.getSession()
+      } = await apiClient.auth.getSession();
       if (!session?.user.id) {
-        throw new Error("User is not authenticated")
+        throw new Error("User is not authenticated");
       }
 
       const { data, error } = await apiClient.from("life_history").update({
@@ -80,29 +82,32 @@ export function useUpdateLifeHistory() {
         id,
         updated_at,
         user_id,
-      })
+      });
       if (error) {
-        throw new Error(error.message)
+        throw new Error(error.message);
       }
-      return data
+      return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["lifeHistories"] })
-    }
-  })
+      queryClient.invalidateQueries({ queryKey: ["lifeHistories"] });
+    },
+  });
 }
 
 export function useDeleteLifeHistory() {
   return useMutation({
     mutationFn: async (id: number) => {
-      const { data, error } = await apiClient.from("life_history").delete().eq("id", id)
+      const { data, error } = await apiClient
+        .from("life_history")
+        .delete()
+        .eq("id", id);
       if (error) {
-        throw new Error(error.message)
+        throw new Error(error.message);
       }
-      return data
+      return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["lifeHistories"] })
-    }
-  })
+      queryClient.invalidateQueries({ queryKey: ["lifeHistories"] });
+    },
+  });
 }
