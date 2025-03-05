@@ -8,103 +8,68 @@ import {
   useGetUserLifeHistories,
 } from "./services/lifeHistory";
 import { useGetCurrentUser } from "./services/user";
-import type { CurrentUser } from "./types";
 // import type { InsertLifeHistory } from "./types";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 // import { Modal } from "./components/Modal";
 import { TitleSelector } from "./components/TitleSelector";
-import { DndContainer } from "./components/dnd-kit/DndContainer";
+import { User } from "@supabase/supabase-js";
+import { LifeHistory } from "./components/LifeHistory";
+import { CurrentUser } from "./types";
 // import { createSwapy, Swapy, utils } from "swapy";
 
 export type LifeUnit = "life" | "year" | "month";
 export type TimeUnit = "years" | "months" | "weeks";
 
-const generateGrid = () => {
-  let items = {
-    decade_1: Array.from({ length: 10 }, (_, i) => (i + 1).toString()),
-    decade_2: Array.from({ length: 10 }, (_, i) => (i + 11).toString()),
-    decade_3: Array.from({ length: 10 }, (_, i) => (i + 21).toString()),
-    decade_4: Array.from({ length: 10 }, (_, i) => (i + 31).toString()),
-    decade_5: Array.from({ length: 10 }, (_, i) => (i + 41).toString()),
-    decade_6: Array.from({ length: 10 }, (_, i) => (i + 51).toString()),
-    decade_7: Array.from({ length: 10 }, (_, i) => (i + 61).toString()),
-    decade_8: Array.from({ length: 10 }, (_, i) => (i + 71).toString()),
-    decade_9: Array.from({ length: 10 }, (_, i) => (i + 81).toString()),
-    decade_10: Array.from({ length: 10 }, (_, i) => (i + 91).toString()),
-  };
-
-  return items;
-};
-
 function App() {
-  // const [text, setText] = useState("");
-  const { mutateAsync: getUserAsync, isPending: getUserIsPending } =
-    useGetCurrentUser();
-  const { signInWithGoogle, signOut } = useAuth();
-  const deleteLifeHistory = useDeleteLifeHistory();
-  const createLifeHistory = useCreateLifeHistory();
-  // const [isOpen, setIsOpen] = useState<boolean>(false);
-  const getUserLifeHistories = useGetUserLifeHistories();
-  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
-  const [lifeUnit, setLifeUnit] = useState<LifeUnit>("life");
-  const [timeUnit, setTimeUnit] = useState<TimeUnit>("years");
-
-  let gridItems = generateGrid();
-
-  // const handleCreateLifeHistory = async () => {
-  // 	if (createLifeHistory.isPending) return;
-
-  // 	if (!currentUser) {
-  // 		console.error("User is not authenticated");
-  // 		return;
-  // 	}
-
-  // 	const newLifeHistory: InsertLifeHistory = {
-  // 		event_text: text,
-  // 		user_id: currentUser.id,
-  // 		// rest of the fields:
-  // 		// event_date,
-  // 		// event_image,
-  // 	};
-
-  // 	createLifeHistory.mutate(newLifeHistory);
-  // 	setText("");
-  // };
+  const [userId, setUserId] = useState<User["id"] | null>(null);
+  const { data: currentUser, isPending: isPendingCurrentUser } =
+    useGetCurrentUser(userId);
 
   useEffect(() => {
     const {
       data: { subscription },
     } = apiClient.auth.onAuthStateChange((_event, session) => {
-      if (session?.user.id) {
-        try {
-          getUserAsync(session.user.id).then((user) => {
-            if (user) setCurrentUser(user);
-          });
-        } catch (error) {
-          console.error(error);
-        }
-      }
+      if (!session) return;
+      setUserId(session.user.id);
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [getUserAsync]);
+  }, []);
 
-  if (!currentUser) {
-    return (
-      <button type="button" onClick={signInWithGoogle}>
-        {getUserIsPending ? "Loading..." : "Iniciar sesión con Google"}
-      </button>
-    );
-  }
+  const isAuthenticated = userId !== null;
 
   return (
-    <main className="flex flex-col items-center justify-center h-screen min-h-full gap-8 py-20">
+    <>
+      {isAuthenticated ? (
+        <>
+          {isPendingCurrentUser && <div>Loading user...</div>}
+          {currentUser && <AuthenticatedApp currentUser={currentUser} />}
+        </>
+      ) : (
+        <UnauthenticatedApp />
+      )}
+    </>
+  );
+}
+
+const AuthenticatedApp = ({ currentUser }: { currentUser: CurrentUser }) => {
+  const { signOut } = useAuth();
+
+  const deleteLifeHistory = useDeleteLifeHistory();
+  const createLifeHistory = useCreateLifeHistory();
+  const getUserLifeHistories = useGetUserLifeHistories();
+
+  const [lifeUnit, setLifeUnit] = useState<LifeUnit>("life");
+  const [timeUnit, setTimeUnit] = useState<TimeUnit>("years");
+
+  return (
+    <main className="p-20 bg-slate-100 flex flex-col items-center justify-center gap-8">
       <Header currentUser={currentUser} />
 
-      <section className="flex flex-col items-center flex-1 w-full max-w-6xl gap-4 mx-auto">
+      <section className="flex-1 w-full max-w-8xl mx-auto flex flex-col gap-4 items-center">
         {createLifeHistory.isPending ? (
           <p>Loading...</p>
         ) : createLifeHistory.isError ? (
@@ -124,16 +89,7 @@ function App() {
           setTimeUnit={setTimeUnit}
         />
 
-        {/* <section className="grid grid-cols-10 gap-2 mt-4">
-          {cells.map((index, cell) => (
-            <div key={cell} className="p-2 text-center bg-gray-100 border">
-              {index === 4 && <p className="bg-blue-500">content</p>}
-              {cell}
-            </div>
-          ))}
-        </section> */}
-
-        <DndContainer gridItems={gridItems}></DndContainer>
+        <LifeHistory />
 
         {getUserLifeHistories.isPending ? (
           <p>Loading...</p>
@@ -158,28 +114,42 @@ function App() {
           </ul>
         ) : null}
 
-        {/* <button
-					type="button"
-					className="px-10 py-2 border-2 border-red w-max hover:bg-slate-200"
-					onClick={() => {
-						setIsOpen(!isOpen);
-					}}
-				>
-					{isOpen ? "Close" : "Create a new life history"}
-				</button> */}
+        {/*
+          <button
+            type="button"
+            className="px-10 py-2 border-2 border-red w-max hover:bg-slate-200"
+            onClick={() => {
+              setIsOpen(!isOpen);
+            }}
+           >
+            {isOpen ? "Close" : "Create a new life history"}
+          </button>
+        */}
 
-        {/* {!!isOpen && (
-					<Modal
-						text={text}
-						setText={setText}
-						handleCreateLifeHistory={handleCreateLifeHistory}
-						createLifeHistory={createLifeHistory}
-					/>
-				)} */}
+        {/* 
+          {!!isOpen && (
+            <Modal
+              text={text}
+              setText={setText}
+              handleCreateLifeHistory={handleCreateLifeHistory}
+              createLifeHistory={createLifeHistory}
+            />
+          )}
+        */}
       </section>
+
       <Footer signOut={signOut} />
     </main>
   );
-}
+};
+
+const UnauthenticatedApp = () => {
+  const { signInWithGoogle } = useAuth();
+  return (
+    <button type="button" onClick={signInWithGoogle}>
+      Iniciar sesión con Google
+    </button>
+  );
+};
 
 export default App;
