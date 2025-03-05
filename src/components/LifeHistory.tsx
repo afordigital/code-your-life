@@ -118,7 +118,9 @@ const LifeHistoryDecade = ({
   decade,
   years,
   setOpenUploadForm,
-}: LifeHistoryDecade) => {
+}: LifeHistoryDecade & {
+  setOpenUploadForm: (openUploadForm: boolean) => void;
+}) => {
   return (
     <div className="flex flex-col w-full gap-2">
       <>Decade {decade}</>
@@ -139,7 +141,9 @@ const LifeHistoryYear = ({
   year,
   months,
   setOpenUploadForm,
-}: LifeHistoryYear) => {
+}: LifeHistoryYear & {
+  setOpenUploadForm: (openUploadForm: boolean) => void;
+}) => {
   return (
     <div className="w-full p-2 rounded-lg bg-slate-200">
       <div className="flex w-full gap-2">
@@ -151,7 +155,8 @@ const LifeHistoryYear = ({
           {months.map(({ id, month, events }) => (
             <LifeHistoryMonth
               key={id}
-              {...{ id, month, events, setOpenUploadForm }}
+              setOpenUploadForm={setOpenUploadForm}
+              {...{ id, month, events }}
             />
           ))}
         </div>
@@ -179,7 +184,9 @@ const LifeHistoryMonth = ({
   month,
   events,
   setOpenUploadForm,
-}: LifeHistoryMonth) => {
+}: LifeHistoryMonth & {
+  setOpenUploadForm: (openUploadForm: boolean) => void;
+}) => {
   return (
     <button
       onClick={() => setOpenUploadForm(true)}
@@ -195,7 +202,6 @@ const LifeHistoryMonth = ({
                 key={event.id}
                 month={{ id, month, events }}
                 event={event}
-                setOpenUploadForm={setOpenUploadForm}
               />
             ))}
           </div>

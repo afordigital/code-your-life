@@ -4,14 +4,12 @@ export type LifeHistoryDecade = {
   id: string;
   decade: number;
   years: LifeHistoryYear[];
-  setOpenUploadForm: (openUplaodForm: boolean) => void;
 };
 
 export type LifeHistoryYear = {
   id: string;
   year: number;
   months: LifeHistoryMonth[];
-  setOpenUploadForm: (openUplaodForm: boolean) => void;
 };
 
 export type LifeHistoryMonthNumber =
@@ -31,7 +29,6 @@ export type LifeHistoryMonth = {
   id: string;
   month: LifeHistoryMonthNumber;
   events: LifeHistoryEvent[];
-  setOpenUploadForm: (openUplaodForm: boolean) => void;
 };
 
 export type LifeHistoryTextEvent = {
