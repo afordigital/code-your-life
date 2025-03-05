@@ -34,7 +34,11 @@ type LifeHistoryEventWithMonth = {
   month: LifeHistoryMonth;
 };
 
-export const LifeHistory = () => {
+export const LifeHistory = ({
+  setOpenUploadForm,
+}: {
+  setOpenUploadForm: (openUploadForm: boolean) => void;
+}) => {
   const [lifeHistory, setLifeHistory] = useState<MonthlyLifeHistory>(
     LifeHistoryDomain.initiate
   );
@@ -92,9 +96,12 @@ export const LifeHistory = () => {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="w-full flex flex-col gap-2">
+      <div className="flex flex-col w-full gap-2">
         {lifeHistory.map(({ id, decade, years }) => (
-          <LifeHistoryDecade key={id} {...{ id, decade, years }} />
+          <LifeHistoryDecade
+            key={id}
+            {...{ id, decade, years, setOpenUploadForm }}
+          />
         ))}
       </div>
 
@@ -107,31 +114,45 @@ export const LifeHistory = () => {
   );
 };
 
-const LifeHistoryDecade = ({ decade, years }: LifeHistoryDecade) => {
+const LifeHistoryDecade = ({
+  decade,
+  years,
+  setOpenUploadForm,
+}: LifeHistoryDecade) => {
   return (
-    <div className="w-full flex flex-col gap-2">
+    <div className="flex flex-col w-full gap-2">
       <>Decade {decade}</>
 
       <div className="flex flex-col gap-2">
         {years.map(({ id, year, months }) => (
-          <LifeHistoryYear key={id} {...{ id, year, months }} />
+          <LifeHistoryYear
+            key={id}
+            {...{ id, year, months, setOpenUploadForm }}
+          />
         ))}
       </div>
     </div>
   );
 };
 
-const LifeHistoryYear = ({ year, months }: LifeHistoryYear) => {
+const LifeHistoryYear = ({
+  year,
+  months,
+  setOpenUploadForm,
+}: LifeHistoryYear) => {
   return (
-    <div className="w-full p-2 bg-slate-200 rounded-lg">
-      <div className="w-full flex gap-2">
-        <div className="p-2 rounded-lg bg-slate-300 grid items-center">
-          <span className="text-center text-sm">Year {year}</span>
+    <div className="w-full p-2 rounded-lg bg-slate-200">
+      <div className="flex w-full gap-2">
+        <div className="grid items-center p-2 rounded-lg bg-slate-300">
+          <span className="text-sm text-center">Year {year}</span>
         </div>
 
         <div className="w-full grid auto-rows-[190px] grid-cols-[repeat(auto-fit,_minmax(190px,_1fr))] gap-2">
           {months.map(({ id, month, events }) => (
-            <LifeHistoryMonth key={id} {...{ id, month, events }} />
+            <LifeHistoryMonth
+              key={id}
+              {...{ id, month, events, setOpenUploadForm }}
+            />
           ))}
         </div>
       </div>
@@ -153,10 +174,18 @@ const MONTH_NUMBER_TO_NAME = {
   11: "November",
   12: "December",
 } as const satisfies Record<LifeHistoryMonthNumber, string>;
-const LifeHistoryMonth = ({ id, month, events }: LifeHistoryMonth) => {
+const LifeHistoryMonth = ({
+  id,
+  month,
+  events,
+  setOpenUploadForm,
+}: LifeHistoryMonth) => {
   return (
-    <div className="p-4 bg-slate-300 rounded-lg">
-      <div className="w-full flex flex-col gap-2">
+    <button
+      onClick={() => setOpenUploadForm(true)}
+      className="p-4 rounded-lg cursor-pointer bg-slate-300 hover:bg-slate-400"
+    >
+      <div className="flex flex-col w-full gap-2">
         <>{MONTH_NUMBER_TO_NAME[month]}</>
 
         <Droppable id={id} data={{ month: { id, month, events } }}>
@@ -166,12 +195,13 @@ const LifeHistoryMonth = ({ id, month, events }: LifeHistoryMonth) => {
                 key={event.id}
                 month={{ id, month, events }}
                 event={event}
+                setOpenUploadForm={setOpenUploadForm}
               />
             ))}
           </div>
         </Droppable>
       </div>
-    </div>
+    </button>
   );
 };
 
@@ -194,7 +224,7 @@ const LifeHistoryEvent = ({
 
 const LifeHistoryTextEvent = ({ event }: { event: LifeHistoryTextEvent }) => {
   return (
-    <div className="p-4 bg-white rounded-md grid items-center">
+    <div className="grid items-center p-4 bg-white rounded-md">
       <span className="text-sm ellipsis">{event.event_text}</span>
     </div>
   );

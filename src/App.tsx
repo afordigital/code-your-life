@@ -16,6 +16,8 @@ import { TitleSelector } from "./components/TitleSelector";
 import { User } from "@supabase/supabase-js";
 import { LifeHistory } from "./components/LifeHistory";
 import { CurrentUser } from "./types";
+import { Onboarding } from "./components/Onboarding";
+import { DateSubmitionForm } from "./components/DateSubmitionForm";
 // import { createSwapy, Swapy, utils } from "swapy";
 
 export type LifeUnit = "life" | "year" | "month";
@@ -25,6 +27,7 @@ function App() {
   const [userId, setUserId] = useState<User["id"] | null>(null);
   const { data: currentUser, isPending: isPendingCurrentUser } =
     useGetCurrentUser(userId);
+  const birth_date = currentUser?.birth_date;
 
   useEffect(() => {
     const {
@@ -46,7 +49,10 @@ function App() {
       {isAuthenticated ? (
         <>
           {isPendingCurrentUser && <div>Loading user...</div>}
-          {currentUser && <AuthenticatedApp currentUser={currentUser} />}
+          {currentUser && !birth_date && <Onboarding />}
+          {currentUser && birth_date && (
+            <AuthenticatedApp currentUser={currentUser} />
+          )}
         </>
       ) : (
         <UnauthenticatedApp />
@@ -65,11 +71,13 @@ const AuthenticatedApp = ({ currentUser }: { currentUser: CurrentUser }) => {
   const [lifeUnit, setLifeUnit] = useState<LifeUnit>("life");
   const [timeUnit, setTimeUnit] = useState<TimeUnit>("years");
 
+  const [openUploadForm, setOpenUploadForm] = useState(false);
+
   return (
-    <main className="p-20 bg-slate-100 flex flex-col items-center justify-center gap-8">
+    <main className="flex flex-col items-center justify-center gap-8 p-20 bg-slate-100">
       <Header currentUser={currentUser} />
 
-      <section className="flex-1 w-full max-w-8xl mx-auto flex flex-col gap-4 items-center">
+      <section className="flex flex-col items-center flex-1 w-full gap-4 mx-auto max-w-8xl">
         {createLifeHistory.isPending ? (
           <p>Loading...</p>
         ) : createLifeHistory.isError ? (
@@ -89,7 +97,10 @@ const AuthenticatedApp = ({ currentUser }: { currentUser: CurrentUser }) => {
           setTimeUnit={setTimeUnit}
         />
 
-        <LifeHistory />
+        <LifeHistory setOpenUploadForm={setOpenUploadForm} />
+        <dialog open={openUploadForm}>
+          <DateSubmitionForm currentUser={currentUser} />
+        </dialog>
 
         {getUserLifeHistories.isPending ? (
           <p>Loading...</p>
