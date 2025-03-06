@@ -72,6 +72,12 @@ const AuthenticatedApp = ({ currentUser }: { currentUser: CurrentUser }) => {
   const [timeUnit, setTimeUnit] = useState<TimeUnit>("years");
 
   const [openUploadForm, setOpenUploadForm] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+
+  const handleOpenForm = (open: boolean, date?: Date) => {
+    setOpenUploadForm(open);
+    setSelectedDate(date);
+  };
 
   return (
     <main className="flex flex-col items-center justify-center gap-8 p-20 bg-slate-100">
@@ -127,10 +133,20 @@ const AuthenticatedApp = ({ currentUser }: { currentUser: CurrentUser }) => {
             ))}
           </ul>
         ) : null}
-        <LifeHistory setOpenUploadForm={setOpenUploadForm} />
-        <dialog open={openUploadForm}>
-          <DateSubmitionForm onSubmition={() => setOpenUploadForm(false)} />
-        </dialog>
+        <LifeHistory
+          birthDate={currentUser.birth_date}
+          setOpenUploadForm={handleOpenForm}
+        />
+        {openUploadForm && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-8 rounded-lg">
+              <DateSubmitionForm
+                selectedDate={selectedDate}
+                onSubmition={() => setOpenUploadForm(false)}
+              />
+            </div>
+          </div>
+        )}
       </section>
 
       <Footer signOut={signOut} />

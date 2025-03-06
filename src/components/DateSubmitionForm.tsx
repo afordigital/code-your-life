@@ -1,12 +1,15 @@
 import { FC, useState } from "react";
 import { useCreateLifeHistory } from "../services/lifeHistory";
+import dayjs from "dayjs";
 
 interface DateSubmitionFormProps {
   onSubmition: () => void;
+  selectedDate: Date | undefined;
 }
 
 export const DateSubmitionForm: FC<DateSubmitionFormProps> = ({
   onSubmition,
+  selectedDate,
 }) => {
   const [note, setNote] = useState<string>("");
   const [imgFiles, setImgFiles] = useState<File[]>([]);
@@ -18,15 +21,22 @@ export const DateSubmitionForm: FC<DateSubmitionFormProps> = ({
 
     await createLifeHistory.mutateAsync({
       event_text: note,
-      //TODO: necesitas pasarle si o si el event_date para saber en que casilla ponerlo en el calendario, de momento lo pongo en la fecha actual
-      event_date: new Date().toISOString(),
-      // puedes pasarle un array de archivos, es el mismo que devuelven los inputs de tipo file
+      event_date: dayjs(selectedDate).format("YYYY-MM-DD"),
       imgFiles,
+      updated_at: dayjs().toISOString(),
     });
+
     setNote("");
     setImgFiles([]);
     onSubmition();
   };
+
+  const formattedDate = selectedDate
+    ? new Intl.DateTimeFormat("es", {
+        year: "numeric",
+        month: "long",
+      }).format(selectedDate)
+    : "fecha actual";
 
   return (
     <>
@@ -37,7 +47,7 @@ export const DateSubmitionForm: FC<DateSubmitionFormProps> = ({
         >
           x
         </span>
-        <p>Tell me about this date</p>
+        <p>Tell me about {formattedDate}</p>
         <textarea
           value={note}
           disabled={createLifeHistory.isPending}

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import dayjs from "dayjs";
 import {
   DndContext,
   DragOverlay,
@@ -35,12 +36,14 @@ type LifeHistoryEventWithMonth = {
 };
 
 export const LifeHistory = ({
+  birthDate,
   setOpenUploadForm,
 }: {
-  setOpenUploadForm: (openUploadForm: boolean) => void;
+  birthDate: string | null;
+  setOpenUploadForm: (openUploadForm: boolean, selectedDate?: Date) => void;
 }) => {
-  const [lifeHistory, setLifeHistory] = useState<MonthlyLifeHistory>(
-    LifeHistoryDomain.initiate
+  const [lifeHistory, setLifeHistory] = useState<MonthlyLifeHistory>(() =>
+    LifeHistoryDomain.initiate(birthDate)
   );
   const [draggedEventWithMonth, setDraggedEventWithMonth] =
     useState<LifeHistoryEventWithMonth | null>(null);
@@ -119,7 +122,7 @@ const LifeHistoryDecade = ({
   years,
   setOpenUploadForm,
 }: LifeHistoryDecade & {
-  setOpenUploadForm: (openUploadForm: boolean) => void;
+  setOpenUploadForm: (openUploadForm: boolean, selectedDate?: Date) => void;
 }) => {
   return (
     <div className="flex flex-col w-full gap-2">
@@ -142,7 +145,7 @@ const LifeHistoryYear = ({
   months,
   setOpenUploadForm,
 }: LifeHistoryYear & {
-  setOpenUploadForm: (openUploadForm: boolean) => void;
+  setOpenUploadForm: (openUploadForm: boolean, selectedDate?: Date) => void;
 }) => {
   return (
     <div className="w-full p-2 rounded-lg bg-slate-200">
@@ -179,17 +182,23 @@ const MONTH_NUMBER_TO_NAME = {
   11: "November",
   12: "December",
 } as const satisfies Record<LifeHistoryMonthNumber, string>;
+
 const LifeHistoryMonth = ({
   id,
   month,
   events,
   setOpenUploadForm,
 }: LifeHistoryMonth & {
-  setOpenUploadForm: (openUploadForm: boolean) => void;
+  setOpenUploadForm: (openUploadForm: boolean, selectedDate?: Date) => void;
 }) => {
+  const handleClick = useCallback(() => {
+    const date = dayjs(id).toDate();
+    setOpenUploadForm(true, date);
+  }, [id, setOpenUploadForm]);
+
   return (
     <button
-      onClick={() => setOpenUploadForm(true)}
+      onClick={handleClick}
       className="p-4 rounded-lg cursor-pointer bg-slate-300 hover:bg-slate-400"
     >
       <div className="flex flex-col w-full gap-2">
