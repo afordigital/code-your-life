@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 export type Json =
   | string
   | number
@@ -12,28 +11,28 @@ export type Database = {
     Tables: {
       life_history: {
         Row: {
+          bucket_url: string | null
           created_at: string | null
-          event_date: string | null
-          event_image: string | null
-          event_text: string | null
+          event_date: string
+          event_text: string
           id: number
           updated_at: string
           user_id: string
         }
         Insert: {
+          bucket_url?: string | null
           created_at?: string | null
-          event_date?: string | null
-          event_image?: string | null
-          event_text?: string | null
+          event_date: string
+          event_text: string
           id?: number
           updated_at?: string
           user_id: string
         }
         Update: {
+          bucket_url?: string | null
           created_at?: string | null
-          event_date?: string | null
-          event_image?: string | null
-          event_text?: string | null
+          event_date?: string
+          event_text?: string
           id?: number
           updated_at?: string
           user_id?: string
@@ -187,5 +186,3 @@ export type CompositeTypes<
   : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
     ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
-=======
->>>>>>> Stashed changes
