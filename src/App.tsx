@@ -18,7 +18,7 @@ import { LifeHistory } from "./components/LifeHistory";
 import { CurrentUser } from "./types";
 import { Onboarding } from "./components/Onboarding";
 import { DateSubmitionForm } from "./components/DateSubmitionForm";
-// import { createSwapy, Swapy, utils } from "swapy";
+import { Login } from "./components/Login";
 
 export type LifeUnit = "life" | "year" | "month";
 export type TimeUnit = "years" | "months" | "weeks";
@@ -155,12 +155,7 @@ const AuthenticatedApp = ({ currentUser }: { currentUser: CurrentUser }) => {
 };
 
 const UnauthenticatedApp = () => {
-  const { signInWithGoogle } = useAuth();
-  return (
-    <button type="button" onClick={signInWithGoogle}>
-      Iniciar sesión con Google
-    </button>
-  );
+  return <Login />;
 };
 
 export default App;

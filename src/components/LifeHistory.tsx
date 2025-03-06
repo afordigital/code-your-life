@@ -29,6 +29,7 @@ import {
 
 import { Draggable } from "./drag-and-drop/Draggable";
 import { Droppable } from "./drag-and-drop/Droppable";
+import { useGetUserLifeHistories } from "../services/lifeHistory";
 
 type LifeHistoryEventWithMonth = {
   event: LifeHistoryEvent;
@@ -88,6 +89,13 @@ export const LifeHistory = ({
         targetMonth,
       })
     );
+
+    console.log(lifeHistory);
+    console.log(sourceMonth);
+    console.log(targetMonth);
+
+    // update sourcemonth con events
+    // update targetmonth con events
 
     setDraggedEventWithMonth(null);
   };
@@ -193,6 +201,8 @@ const LifeHistoryMonth = ({
 }) => {
   const handleClick = useCallback(() => {
     const date = dayjs(id).toDate();
+    console.log(id);
+
     setOpenUploadForm(true, date);
   }, [id, setOpenUploadForm]);
 
@@ -227,12 +237,32 @@ const LifeHistoryEvent = ({
   event: LifeHistoryEvent;
   month: LifeHistoryMonth;
 }) => {
+  const getUserLifeHistories = useGetUserLifeHistories();
+  const life_histories = getUserLifeHistories?.data;
+
   return (
     <Draggable id={event.id} data={{ event, month }}>
       {isLifeHistoryTextEvent(event) && <LifeHistoryTextEvent event={event} />}
       {isLifeHistoryImageEvent(event) && (
         <LifeHistoryImageEvent event={event} />
       )}
+      {life_histories?.map((history) => {
+        return (
+          <>
+            {dayjs(history.event_date).format("YYYY-MM") == month.id && (
+              <>
+                <p>{history.event_text}</p>
+                {history.imagesUrls.length > 0 && (
+                  <img
+                    src={history.imagesUrls[0].url}
+                    alt={history.imagesUrls[0].name}
+                  />
+                )}
+              </>
+            )}
+          </>
+        );
+      })}
     </Draggable>
   );
 };

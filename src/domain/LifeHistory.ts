@@ -71,7 +71,7 @@ export const LifeHistory = {
     const birthYear = birthDateDayjs.year();
     const birthMonth = birthDateDayjs.month() + 1; // dayjs months are 0-indexed
 
-    const maxAge = 80;
+    const maxAge = 10;
     const maxYear = birthYear + maxAge;
 
     const startDecade = Math.floor(birthYear / 10);
