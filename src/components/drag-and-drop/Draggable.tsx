@@ -1,14 +1,13 @@
+import { type ReactNode } from "react";
 import { useDraggable } from "@dnd-kit/core";
 
-export const Draggable = <DraggableData extends object>({
-  id,
-  data,
-  children,
-}: {
-  id: string | number;
-  data: DraggableData;
-  children: React.ReactNode;
-}) => {
+interface DraggableProps {
+  id: string;
+  data: Record<string, unknown>;
+  children: ReactNode;
+}
+
+export function Draggable({ id, data, children }: DraggableProps) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id,
     data,
@@ -20,8 +19,8 @@ export const Draggable = <DraggableData extends object>({
     : {};
 
   return (
-    <button ref={setNodeRef} style={style} {...listeners} {...attributes}>
+    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
       {children}
-    </button>
+    </div>
   );
-};
+}
