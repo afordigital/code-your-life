@@ -59,6 +59,7 @@ export const DateSubmitionForm: FC<DateSubmitionFormProps> = ({
         type="file"
         className="m-8"
         multiple
+        accept="image/*"
         onChange={(e) => {
           if (e.target.files) {
             setImgFiles(Array.from(e.target.files));

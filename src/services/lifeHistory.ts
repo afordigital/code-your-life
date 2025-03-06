@@ -7,6 +7,10 @@ import {
 } from "../types";
 import { queryClient } from "../main";
 
+const QUERY_KEYS = {
+  lifeHistories: "lifeHistories",
+} as const;
+
 async function getAuthenticatedUserId(): Promise<string> {
   const {
     data: { session },
@@ -75,7 +79,7 @@ async function uploadImages(
 
 export function useGetUserLifeHistories() {
   return useQuery({
-    queryKey: ["lifeHistories"],
+    queryKey: [QUERY_KEYS.lifeHistories],
     queryFn: async () => {
       const userId = await getAuthenticatedUserId();
 
@@ -162,7 +166,7 @@ export function useCreateLifeHistory() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["lifeHistories"] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.lifeHistories] });
     },
   });
 }
@@ -197,7 +201,7 @@ export function useUpdateLifeHistory() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["lifeHistories"] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.lifeHistories] });
     },
   });
 }
@@ -259,7 +263,7 @@ export function useDeleteLifeHistory() {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["lifeHistories"] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.lifeHistories] });
     },
   });
 }
