@@ -97,11 +97,6 @@ const AuthenticatedApp = ({ currentUser }: { currentUser: CurrentUser }) => {
           setTimeUnit={setTimeUnit}
         />
 
-        <LifeHistory setOpenUploadForm={setOpenUploadForm} />
-        <dialog open={openUploadForm}>
-          <DateSubmitionForm currentUser={currentUser} />
-        </dialog>
-
         {getUserLifeHistories.isPending ? (
           <p>Loading...</p>
         ) : getUserLifeHistories.isError ? (
@@ -111,6 +106,14 @@ const AuthenticatedApp = ({ currentUser }: { currentUser: CurrentUser }) => {
             {getUserLifeHistories?.data?.map((lifeHistory) => (
               <li key={lifeHistory.id} className="flex gap-1">
                 <p>{lifeHistory.event_text}</p>
+                {lifeHistory.imagesUrls.map(({ name, url }) => (
+                  <img
+                    className="w-8 h-8 object-cover"
+                    key={name}
+                    src={url}
+                    alt={name}
+                  />
+                ))}
                 <button
                   type="button"
                   onClick={() => {
@@ -124,29 +127,10 @@ const AuthenticatedApp = ({ currentUser }: { currentUser: CurrentUser }) => {
             ))}
           </ul>
         ) : null}
-
-        {/*
-          <button
-            type="button"
-            className="px-10 py-2 border-2 border-red w-max hover:bg-slate-200"
-            onClick={() => {
-              setIsOpen(!isOpen);
-            }}
-           >
-            {isOpen ? "Close" : "Create a new life history"}
-          </button>
-        */}
-
-        {/* 
-          {!!isOpen && (
-            <Modal
-              text={text}
-              setText={setText}
-              handleCreateLifeHistory={handleCreateLifeHistory}
-              createLifeHistory={createLifeHistory}
-            />
-          )}
-        */}
+        <LifeHistory setOpenUploadForm={setOpenUploadForm} />
+        <dialog open={openUploadForm}>
+          <DateSubmitionForm onSubmition={() => setOpenUploadForm(false)} />
+        </dialog>
       </section>
 
       <Footer signOut={signOut} />
