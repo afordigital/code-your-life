@@ -1,43 +1,44 @@
 {
-  "name": "code-your-life",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "supabase-gen-types": "npx supabase gen types typescript --project-id 'hckzsirtpkhuupdqcfia' --schema public > src/database.types.ts"
-  },
-  "dependencies": {
-    "@dnd-kit/core": "^6.3.1",
-    "@dnd-kit/sortable": "^10.0.0",
-    "@dnd-kit/utilities": "^3.2.2",
-    "@supabase/auth-ui-react": "^0.4.7",
-    "@supabase/auth-ui-shared": "^0.1.8",
-    "@supabase/supabase-js": "^2.49.1",
-    "@tanstack/react-query": "^5.66.11",
-    "dayjs": "^1.11.13",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "swapy": "^1.0.5"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.21.0",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
-    "@vitejs/plugin-react-swc": "^3.8.0",
-    "autoprefixer": "^10.4.20",
-    "eslint": "^9.21.0",
-    "eslint-plugin-react-hooks": "^5.1.0",
-    "eslint-plugin-react-refresh": "^0.4.19",
-    "globals": "^15.15.0",
-    "postcss": "^8.5.3",
-    "supabase": ">=1.8.1",
-    "tailwindcss": "^3.4.1",
-    "typescript": "~5.7.2",
-    "typescript-eslint": "^8.24.1",
-    "vite": "^6.2.0"
-  }
+	"name": "code-your-life",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "tsc -b && vite build",
+		"format": "biome format --write .",
+		"lint": "biome lint .",
+		"preview": "vite preview",
+		"supabase-gen-types": "npx supabase gen types typescript --project-id 'hckzsirtpkhuupdqcfia' --schema public > src/database.types.ts"
+	},
+	"dependencies": {
+		"@dnd-kit/core": "^6.3.1",
+		"@dnd-kit/sortable": "^10.0.0",
+		"@dnd-kit/utilities": "^3.2.2",
+		"@supabase/auth-ui-react": "^0.4.7",
+		"@supabase/auth-ui-shared": "^0.1.8",
+		"@supabase/supabase-js": "^2.49.1",
+		"@tanstack/react-query": "^5.66.11",
+		"dayjs": "^1.11.13",
+		"react": "^19.0.0",
+		"react-dom": "^19.0.0",
+		"swapy": "^1.0.5"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^1.9.4",
+		"@types/react": "^19.0.10",
+		"@types/react-dom": "^19.0.4",
+		"@vitejs/plugin-react-swc": "^3.8.0",
+		"autoprefixer": "^10.4.20",
+		"eslint": "^9.21.0",
+		"eslint-plugin-react-hooks": "^5.1.0",
+		"eslint-plugin-react-refresh": "^0.4.19",
+		"globals": "^15.15.0",
+		"postcss": "^8.5.3",
+		"supabase": ">=1.8.1",
+		"tailwindcss": "^3.4.1",
+		"typescript": "~5.7.2",
+		"typescript-eslint": "^8.24.1",
+		"vite": "^6.2.0"
+	}
 }
