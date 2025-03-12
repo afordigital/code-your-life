@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { ListLifeHistories } from "../types";
 
 export type MonthlyLifeHistory = LifeHistoryDecade[];
 
@@ -34,7 +35,7 @@ export type LifeHistoryMonth = {
 };
 
 export type LifeHistoryTextEvent = {
-	id: string;
+	id: number;
 	event_date: string;
 	event_text: string;
 	updated_at: string;
@@ -42,7 +43,7 @@ export type LifeHistoryTextEvent = {
 };
 
 export type LifeHistoryImageEvent = {
-	id: string;
+	id: number;
 	event_date: string;
 	event_image: string;
 	updated_at: string;
@@ -64,8 +65,24 @@ export const isLifeHistoryImageEvent = (
 export type LifeHistoryEvent = LifeHistoryTextEvent | LifeHistoryImageEvent;
 
 export const LifeHistory = {
-	initiate: (birthDate: string | null = null): MonthlyLifeHistory => {
+	initiate: (
+		birthDate: string,
+		lifeHistories: ListLifeHistories[],
+	): MonthlyLifeHistory => {
 		if (!birthDate) return [];
+
+		const lifeHistoriesByDate = lifeHistories.reduce(
+			(lifeHistoriesByDate, lifeHistory) => {
+				return {
+					...lifeHistoriesByDate,
+					[lifeHistory.event_date]: [
+						...(lifeHistoriesByDate[lifeHistory.event_date] || []),
+						lifeHistory,
+					],
+				};
+			},
+			{} as Record<string, ListLifeHistories[]>,
+		);
 
 		const birthDateDayjs = dayjs(birthDate);
 		const birthYear = birthDateDayjs.year();
@@ -109,21 +126,14 @@ export const LifeHistory = {
 								(_, monthIndex) => {
 									const month = (startMonth +
 										monthIndex) as LifeHistoryMonthNumber;
-
+									const events =
+										lifeHistoriesByDate[
+											dayjs(`${year}-${month}-01`).format("YYYY-MM-DD")
+										] ?? [];
 									return {
 										id: dayjs(`${year}-${month}-01`).format("YYYY-MM"),
 										month,
-										events: [
-											{
-												id: crypto.randomUUID(),
-												event_date: dayjs(`${year}-${month}-15`).format(
-													"YYYY-MM-DD",
-												),
-												event_text: String(monthIndex),
-												updated_at: dayjs().format(),
-												user_id: "string",
-											},
-										] as const as LifeHistoryEvent[],
+										events: events as LifeHistoryEvent[],
 									} as const as LifeHistoryMonth;
 								},
 							),
@@ -139,7 +149,7 @@ export const LifeHistory = {
 		sourceMonth,
 		targetMonth,
 	}: {
-		event: LifeHistoryEvent;
+		event: Pick<LifeHistoryEvent, "id">;
 		lifeHistory: MonthlyLifeHistory;
 		sourceMonth: LifeHistoryMonth;
 		targetMonth: LifeHistoryMonth;

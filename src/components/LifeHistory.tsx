@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import dayjs from "dayjs";
 import {
 	DndContext,
@@ -23,13 +23,15 @@ import {
 	type LifeHistoryMonth,
 	type LifeHistoryMonthNumber,
 	type LifeHistoryYear,
-	type MonthlyLifeHistory,
 	LifeHistory as LifeHistoryDomain,
 } from "../domain/LifeHistory";
 
 import { Draggable } from "./drag-and-drop/Draggable";
 import { Droppable } from "./drag-and-drop/Droppable";
-import { useGetUserLifeHistories } from "../services/lifeHistory";
+import {
+	useGetUserLifeHistories,
+	useUpdateLifeHistory,
+} from "../services/lifeHistory";
 
 type LifeHistoryEventWithMonth = {
 	event: LifeHistoryEvent;
@@ -40,14 +42,20 @@ export const LifeHistory = ({
 	birthDate,
 	setOpenUploadForm,
 }: {
-	birthDate: string | null;
+	birthDate: string;
 	setOpenUploadForm: (openUploadForm: boolean, selectedDate?: Date) => void;
 }) => {
-	const [lifeHistory, setLifeHistory] = useState<MonthlyLifeHistory>(() =>
-		LifeHistoryDomain.initiate(birthDate),
+	const { data: lifeHistories = [] } = useGetUserLifeHistories();
+
+	const lifeHistory = useMemo(
+		() => LifeHistoryDomain.initiate(birthDate, lifeHistories),
+		[birthDate, lifeHistories],
 	);
+
 	const [draggedEventWithMonth, setDraggedEventWithMonth] =
 		useState<LifeHistoryEventWithMonth | null>(null);
+
+	const updateLifeHistory = useUpdateLifeHistory();
 
 	const sensors = useSensors(
 		useSensor(PointerSensor),
@@ -67,7 +75,7 @@ export const LifeHistory = ({
 		});
 	};
 
-	const handleDragEnd = (event: DragEndEvent) => {
+	const handleDragEnd = async (event: DragEndEvent) => {
 		const { active, over } = event;
 
 		if (!active) return;
@@ -77,25 +85,12 @@ export const LifeHistory = ({
 
 		const lifeHistoryEvent = active.data.current.event;
 
-		const sourceMonth = active.data.current.month;
-
 		const targetMonth = over.data.current.month;
 
-		setLifeHistory((lifeHistory) =>
-			LifeHistoryDomain.moveEvent({
-				event: lifeHistoryEvent,
-				lifeHistory,
-				sourceMonth,
-				targetMonth,
-			}),
-		);
-
-		console.log(lifeHistory);
-		console.log(sourceMonth);
-		console.log(targetMonth);
-
-		// update sourcemonth con events
-		// update targetmonth con events
+		await updateLifeHistory.mutateAsync({
+			...lifeHistoryEvent,
+			event_date: `${targetMonth.id}-01`,
+		});
 
 		setDraggedEventWithMonth(null);
 	};
@@ -204,7 +199,6 @@ const LifeHistoryMonth = ({
 }) => {
 	const handleClick = useCallback(() => {
 		const date = dayjs(id).toDate();
-		console.log(id);
 
 		setOpenUploadForm(true, date);
 	}, [id, setOpenUploadForm]);
@@ -242,32 +236,12 @@ const LifeHistoryEvent = ({
 	event: LifeHistoryEvent;
 	month: LifeHistoryMonth;
 }) => {
-	const getUserLifeHistories = useGetUserLifeHistories();
-	const life_histories = getUserLifeHistories?.data;
-
 	return (
 		<Draggable id={event.id} data={{ event, month }}>
 			{isLifeHistoryTextEvent(event) && <LifeHistoryTextEvent event={event} />}
 			{isLifeHistoryImageEvent(event) && (
 				<LifeHistoryImageEvent event={event} />
 			)}
-			{life_histories?.map((history) => {
-				return (
-					<div key={history.id}>
-						{dayjs(history.event_date).format("YYYY-MM") === month.id && (
-							<>
-								<p>{history.event_text}</p>
-								{history.imagesUrls.length > 0 && (
-									<img
-										src={history.imagesUrls[0].url}
-										alt={history.imagesUrls[0].name}
-									/>
-								)}
-							</>
-						)}
-					</div>
-				);
-			})}
 		</Draggable>
 	);
 };

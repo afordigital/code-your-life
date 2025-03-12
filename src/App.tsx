@@ -133,10 +133,14 @@ const AuthenticatedApp = ({ currentUser }: { currentUser: CurrentUser }) => {
 						))}
 					</ul>
 				) : null}
-				<LifeHistory
-					birthDate={currentUser.birth_date}
-					setOpenUploadForm={handleOpenForm}
-				/>
+
+				{currentUser.birth_date && (
+					<LifeHistory
+						birthDate={currentUser.birth_date}
+						setOpenUploadForm={handleOpenForm}
+					/>
+				)}
+
 				{openUploadForm && (
 					<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
 						<div className="bg-white p-8 rounded-lg">

@@ -6,6 +6,7 @@ import type {
 	UpdateLifeHistory,
 } from "../types";
 import { queryClient } from "../main";
+import { LifeHistoryDecade } from "../domain/LifeHistory";
 
 const QUERY_KEYS = {
 	lifeHistories: "lifeHistories",
@@ -173,14 +174,10 @@ export function useCreateLifeHistory() {
 
 export function useUpdateLifeHistory() {
 	return useMutation({
-		mutationFn: async ({
-			event_date,
-			event_text,
-			id,
-			updated_at,
-			imgFiles,
-		}: UpdateLifeHistory) => {
+		mutationFn: async (event: UpdateLifeHistory) => {
 			const userId = await getAuthenticatedUserId();
+
+			const { id, event_date, event_text, updated_at, imgFiles } = event;
 
 			const { error } = await apiClient
 				.from("life_history")
@@ -199,6 +196,31 @@ export function useUpdateLifeHistory() {
 			if (imgFiles?.length) {
 				await uploadImages(userId, id, imgFiles);
 			}
+		},
+		onMutate: async (event: UpdateLifeHistory) => {
+			await queryClient.cancelQueries({ queryKey: [QUERY_KEYS.lifeHistories] });
+
+			const currentLifeHistory = queryClient.getQueryData([
+				QUERY_KEYS.lifeHistories,
+			]) as LifeHistoryDecade[];
+
+			queryClient.setQueryData(
+				[QUERY_KEYS.lifeHistories],
+				currentLifeHistory.map((lifeHistoryEvent) =>
+					String(lifeHistoryEvent.id) !== String(event.id)
+						? lifeHistoryEvent
+						: event,
+				),
+			);
+
+			return { currentLifeHistory };
+		},
+		onError: (_error, _update, context) => {
+			if (!context) return;
+			queryClient.setQueryData(
+				[QUERY_KEYS.lifeHistories],
+				context.currentLifeHistory,
+			);
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.lifeHistories] });
