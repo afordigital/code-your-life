@@ -27,6 +27,7 @@ import {
 import { Draggable } from "./drag-and-drop/Draggable";
 import { Droppable } from "./drag-and-drop/Droppable";
 import {
+  useDeleteLifeHistory,
   useGetUserLifeHistories,
   useUpdateLifeHistory,
 } from "../services/lifeHistory";
@@ -246,9 +247,22 @@ const LifeHistoryEvent = ({
 
 // biome-ignore lint/suspicious/noRedeclare: <explanation>
 const LifeHistoryTextEvent = ({ event }: { event: LifeHistoryEvent }) => {
+  //   const deleteLifeHistory = useDeleteLifeHistory();
+
   return (
-    <div className="grid items-center p-4 bg-red-500 rounded-md">
+    <div className="relative grid items-center p-4 bg-slate-100 rounded-md">
       <span className="text-sm ellipsis">{event.event_text}</span>
+      {/* <button
+        type="button"
+        onClick={() => {
+          console.log(event);
+          //   console.log("he clickado al botón");
+          deleteLifeHistory.mutate(event.id);
+        }}
+        className="absolute -top-4 w-5 h-5 bg-red-500"
+      >
+        x
+      </button> */}
     </div>
   );
 };

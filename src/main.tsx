@@ -6,10 +6,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 export const queryClient = new QueryClient();
 
-createRoot(document.getElementById("root") as HTMLElement).render(
-	<QueryClientProvider client={queryClient}>
-		<StrictMode>
-			<App />
-		</StrictMode>
-	</QueryClientProvider>,
+createRoot(document.getElementById("root")!).render(
+  <QueryClientProvider client={queryClient}>
+    <StrictMode>
+      <App />
+    </StrictMode>
+  </QueryClientProvider>
 );

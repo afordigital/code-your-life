@@ -27,6 +27,7 @@ function App() {
   const [userId, setUserId] = useState<User["id"] | null>(null);
   const { data: currentUser, isPending: isPendingCurrentUser } =
     useGetCurrentUser(userId);
+
   const birth_date = currentUser?.birth_date;
 
   useEffect(() => {
