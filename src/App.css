@@ -1,0 +1,183 @@
+:root {
+  --custom-black: #191919;
+  --primary: #204d3d;
+  --secondary: #b8e0d2;
+}
+
+@font-face {
+  font-family: "dm-sans";
+  font-display: swap;
+  font-weight: 400;
+  src: url("/fonts/dm-sans-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "dm-sans";
+  font-display: swap;
+  font-weight: 500;
+  src: url("/fonts/dm-sans-500.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "dm-sans";
+  font-display: swap;
+  font-weight: 600;
+  src: url("/fonts/dm-sans-600.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "dm-sans";
+  font-display: swap;
+  font-weight: 700;
+  src: url("/fonts/dm-sans-700.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "dm-sans";
+  font-display: swap;
+  font-weight: 800;
+  src: url("/fonts/dm-sans-800.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "dm-sans";
+  font-display: swap;
+  font-weight: 900;
+  src: url("/fonts/dm-sans-900.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Fredoka Variable";
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("/fonts/Fredoka-VariableFont.woff2") format("woff2");
+}
+
+body {
+  font-family: "dm-sans";
+}
+
+.bg-custom {
+  background-color: #fafafa;
+  background-image: radial-gradient(#204d3d44 1px, transparent 0);
+  background-size: 30px 30px;
+}
+
+.button-primary {
+  background: var(--secondary);
+  border: none;
+  position: relative;
+  font-size: 18px;
+  padding: 18px 64px;
+  border-radius: 100px;
+  width: 328px;
+  height: 55px;
+  font-weight: 500;
+  color: var(--custom-black);
+}
+
+.button-primary::before {
+  content: "";
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  border-radius: 100px;
+  background: var(--secondary);
+  border: 1.5px solid var(--custom-black);
+  z-index: 1;
+  transtion: scale 1s ease-in-out;
+}
+
+.button-primary::after {
+  content: "";
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  border-radius: 100px;
+  background: #b8e0d2;
+  z-index: 0;
+}
+
+.custom-button {
+  background: transparent;
+  border: none;
+  position: relative;
+  font-size: 18px;
+  padding: 18px 64px;
+  border-radius: 100px;
+  width: 328px;
+  height: 55px;
+  font-weight: 500;
+  color: var(--custom-black);
+}
+
+.custom-input {
+  font-size: 18px;
+  padding: 18px 64px;
+  border-radius: 100px;
+  width: 328px;
+  height: 55px;
+  color: var(--custom-black);
+  border: 1.5px solid var(--custom-black);
+}
+
+.custom-button::before {
+  content: "";
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  inset: 0;
+  border-radius: 100px;
+  background: white;
+  border: 1.5px solid var(--custom-black);
+  z-index: 1;
+  transtion: scale 1s ease-in-out;
+}
+
+.custom-button::after {
+  content: "";
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  border-radius: 100px;
+  background: #b8e0d2;
+  z-index: 0;
+}
+
+.custom-button span {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  z-index: 1;
+  text-wrap: nowrap;
+}
+
+.custom-button:hover::before {
+  background: transparent;
+}
+.button-primary span {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  z-index: 1;
+  text-wrap: nowrap;
+}
+
+.button-primary:hover::before {
+  background: white;
+}

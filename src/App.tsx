@@ -3,9 +3,9 @@ import "./App.css";
 import { apiClient } from "./utils/api";
 import { useAuth } from "./hooks/useAuth";
 import {
-	useCreateLifeHistory,
-	useDeleteLifeHistory,
-	useGetUserLifeHistories,
+  useCreateLifeHistory,
+  useDeleteLifeHistory,
+  useGetUserLifeHistories,
 } from "./services/lifeHistory";
 import { useGetCurrentUser } from "./services/user";
 // import type { InsertLifeHistory } from "./types";
@@ -24,142 +24,142 @@ export type LifeUnit = "life" | "year" | "month";
 export type TimeUnit = "years" | "months" | "weeks";
 
 function App() {
-	const [userId, setUserId] = useState<User["id"] | null>(null);
-	const { data: currentUser, isPending: isPendingCurrentUser } =
-		useGetCurrentUser(userId);
-	const birth_date = currentUser?.birth_date;
+  const [userId, setUserId] = useState<User["id"] | null>(null);
+  const { data: currentUser, isPending: isPendingCurrentUser } =
+    useGetCurrentUser(userId);
+  const birth_date = currentUser?.birth_date;
 
-	useEffect(() => {
-		const {
-			data: { subscription },
-		} = apiClient.auth.onAuthStateChange((_event, session) => {
-			if (!session) return;
-			setUserId(session.user.id);
-		});
+  useEffect(() => {
+    const {
+      data: { subscription },
+    } = apiClient.auth.onAuthStateChange((_event, session) => {
+      if (!session) return;
+      setUserId(session.user.id);
+    });
 
-		return () => {
-			subscription.unsubscribe();
-		};
-	}, []);
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
-	const isAuthenticated = userId !== null;
+  const isAuthenticated = userId !== null;
 
-	return (
-		<>
-			{isAuthenticated ? (
-				<>
-					{isPendingCurrentUser && <div>Loading user...</div>}
-					{currentUser && !birth_date && <Onboarding />}
-					{currentUser && birth_date && (
-						<AuthenticatedApp currentUser={currentUser} />
-					)}
-				</>
-			) : (
-				<UnauthenticatedApp />
-			)}
-		</>
-	);
+  return (
+    <section className="bg-custom">
+      {isAuthenticated ? (
+        <>
+          {isPendingCurrentUser && <div>Loading user...</div>}
+          {currentUser && !birth_date && <Onboarding />}
+          {currentUser && birth_date && (
+            <AuthenticatedApp currentUser={currentUser} />
+          )}
+        </>
+      ) : (
+        <UnauthenticatedApp />
+      )}
+    </section>
+  );
 }
 
 const AuthenticatedApp = ({ currentUser }: { currentUser: CurrentUser }) => {
-	const { signOut } = useAuth();
+  const { signOut } = useAuth();
 
-	const deleteLifeHistory = useDeleteLifeHistory();
-	const createLifeHistory = useCreateLifeHistory();
-	const getUserLifeHistories = useGetUserLifeHistories();
+  const deleteLifeHistory = useDeleteLifeHistory();
+  const createLifeHistory = useCreateLifeHistory();
+  const getUserLifeHistories = useGetUserLifeHistories();
 
-	const [lifeUnit, setLifeUnit] = useState<LifeUnit>("life");
-	const [timeUnit, setTimeUnit] = useState<TimeUnit>("years");
+  const [lifeUnit, setLifeUnit] = useState<LifeUnit>("life");
+  const [timeUnit, setTimeUnit] = useState<TimeUnit>("years");
 
-	const [openUploadForm, setOpenUploadForm] = useState(false);
-	const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [openUploadForm, setOpenUploadForm] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
-	const handleOpenForm = (open: boolean, date?: Date) => {
-		setOpenUploadForm(open);
-		setSelectedDate(date);
-	};
+  const handleOpenForm = (open: boolean, date?: Date) => {
+    setOpenUploadForm(open);
+    setSelectedDate(date);
+  };
 
-	return (
-		<main className="flex flex-col items-center justify-center gap-8 p-20 bg-slate-100">
-			<Header currentUser={currentUser} />
+  return (
+    <main className="flex flex-col items-center justify-center gap-8 p-20 bg-slate-100">
+      <Header currentUser={currentUser} />
 
-			<section className="flex flex-col items-center flex-1 w-full gap-4 mx-auto max-w-8xl">
-				{createLifeHistory.isPending ? (
-					<p>Loading...</p>
-				) : createLifeHistory.isError ? (
-					<p>Error: {createLifeHistory.error.message}</p>
-				) : null}
+      <section className="flex flex-col items-center flex-1 w-full gap-4 mx-auto max-w-8xl">
+        {createLifeHistory.isPending ? (
+          <p>Loading...</p>
+        ) : createLifeHistory.isError ? (
+          <p>Error: {createLifeHistory.error.message}</p>
+        ) : null}
 
-				{deleteLifeHistory.isPending ? (
-					<p>Loading...</p>
-				) : deleteLifeHistory.isError ? (
-					<p>Error: {deleteLifeHistory.error.message}</p>
-				) : null}
+        {deleteLifeHistory.isPending ? (
+          <p>Loading...</p>
+        ) : deleteLifeHistory.isError ? (
+          <p>Error: {deleteLifeHistory.error.message}</p>
+        ) : null}
 
-				<TitleSelector
-					lifeUnit={lifeUnit}
-					setLifeUnit={setLifeUnit}
-					timeUnit={timeUnit}
-					setTimeUnit={setTimeUnit}
-				/>
+        <TitleSelector
+          lifeUnit={lifeUnit}
+          setLifeUnit={setLifeUnit}
+          timeUnit={timeUnit}
+          setTimeUnit={setTimeUnit}
+        />
 
-				{getUserLifeHistories.isPending ? (
-					<p>Loading...</p>
-				) : getUserLifeHistories.isError ? (
-					<p>Error: {getUserLifeHistories.error.message}</p>
-				) : getUserLifeHistories.isSuccess ? (
-					<ul className="list-disc">
-						{getUserLifeHistories?.data?.map((lifeHistory) => (
-							<li key={lifeHistory.id} className="flex gap-1">
-								<p>{lifeHistory.event_text}</p>
-								{lifeHistory.imagesUrls.map(({ name, url }) => (
-									<img
-										className="w-8 h-8 object-cover"
-										key={name}
-										src={url}
-										alt={name}
-									/>
-								))}
-								<button
-									type="button"
-									onClick={() => {
-										deleteLifeHistory.mutate(lifeHistory.id);
-									}}
-									className="text-red-500"
-								>
-									Delete
-								</button>
-							</li>
-						))}
-					</ul>
-				) : null}
+        {getUserLifeHistories.isPending ? (
+          <p>Loading...</p>
+        ) : getUserLifeHistories.isError ? (
+          <p>Error: {getUserLifeHistories.error.message}</p>
+        ) : getUserLifeHistories.isSuccess ? (
+          <ul className="list-disc">
+            {getUserLifeHistories?.data?.map((lifeHistory) => (
+              <li key={lifeHistory.id} className="flex gap-1">
+                <p>{lifeHistory.event_text}</p>
+                {lifeHistory.imagesUrls.map(({ name, url }) => (
+                  <img
+                    className="w-8 h-8 object-cover"
+                    key={name}
+                    src={url}
+                    alt={name}
+                  />
+                ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    deleteLifeHistory.mutate(lifeHistory.id);
+                  }}
+                  className="text-red-500"
+                >
+                  Delete
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : null}
 
-				{currentUser.birth_date && (
-					<LifeHistory
-						birthDate={currentUser.birth_date}
-						setOpenUploadForm={handleOpenForm}
-					/>
-				)}
+        {currentUser.birth_date && (
+          <LifeHistory
+            birthDate={currentUser.birth_date}
+            setOpenUploadForm={handleOpenForm}
+          />
+        )}
 
-				{openUploadForm && (
-					<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-						<div className="bg-white p-8 rounded-lg">
-							<DateSubmitionForm
-								selectedDate={selectedDate}
-								onSubmition={() => setOpenUploadForm(false)}
-							/>
-						</div>
-					</div>
-				)}
-			</section>
+        {openUploadForm && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-8 rounded-lg">
+              <DateSubmitionForm
+                selectedDate={selectedDate}
+                onSubmition={() => setOpenUploadForm(false)}
+              />
+            </div>
+          </div>
+        )}
+      </section>
 
-			<Footer signOut={signOut} />
-		</main>
-	);
+      <Footer signOut={signOut} />
+    </main>
+  );
 };
 
 const UnauthenticatedApp = () => {
-	return <Login />;
+  return <Login />;
 };
 
 export default App;
