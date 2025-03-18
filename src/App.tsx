@@ -83,6 +83,10 @@ const AuthenticatedApp = ({ currentUser }: { currentUser: CurrentUser }) => {
     <main className="flex flex-col items-center justify-center gap-8 p-20 bg-slate-100">
       <Header currentUser={currentUser} />
 
+      <button type="button" onClick={signOut}>
+        Log Out
+      </button>
+
       <section className="flex flex-col items-center flex-1 w-full gap-4 mx-auto max-w-8xl">
         {createLifeHistory.isPending ? (
           <p>Loading...</p>
@@ -153,7 +157,7 @@ const AuthenticatedApp = ({ currentUser }: { currentUser: CurrentUser }) => {
         )}
       </section>
 
-      <Footer signOut={signOut} />
+      <Footer />
     </main>
   );
 };
