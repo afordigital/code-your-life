@@ -20,6 +20,7 @@
 		"@supabase/supabase-js": "^2.49.1",
 		"@tanstack/react-query": "^5.66.11",
 		"dayjs": "^1.11.13",
+		"lucide-react": "^0.483.0",
 		"react": "^19.0.0",
 		"react-dom": "^19.0.0",
 		"swapy": "^1.0.5"
@@ -40,5 +41,15 @@
 		"typescript": "~5.7.2",
 		"typescript-eslint": "^8.24.1",
 		"vite": "^6.2.0"
+	},
+	"lint-staged": {
+		"*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
+			"biome check --files-ignore-unknown=true",
+			"biome check --write --no-errors-on-unmatched",
+			"biome check --write --organize-imports-enabled=false --no-errors-on-unmatched",
+			"biome check --write --unsafe --no-errors-on-unmatched",
+			"biome format --write --no-errors-on-unmatched",
+			"biome lint --write --no-errors-on-unmatched"
+		]
 	}
 }
