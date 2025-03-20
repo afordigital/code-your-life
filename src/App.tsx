@@ -19,6 +19,7 @@ import type { CurrentUser } from "./types";
 import { Onboarding } from "./components/Onboarding";
 import { DateSubmitionForm } from "./components/DateSubmitionForm";
 import { Login } from "./components/Login";
+import DarkModeToggle from "./components/DarkModeToggle";
 
 export type LifeUnit = "life" | "year" | "month";
 export type TimeUnit = "years" | "months" | "weeks";
@@ -45,7 +46,11 @@ function App() {
   const isAuthenticated = userId !== null;
 
   return (
-    <section className="bg-custom">
+    <section className="bg-custom min-h-screen">
+      <div className="fixed top-4 right-4 z-50">
+        <DarkModeToggle />
+      </div>
+
       {isAuthenticated ? (
         <>
           {isPendingCurrentUser && <div>Loading user...</div>}
@@ -80,10 +85,10 @@ const AuthenticatedApp = ({ currentUser }: { currentUser: CurrentUser }) => {
   };
 
   return (
-    <main className="flex flex-col items-center justify-center gap-8 p-20 bg-slate-100">
+    <main className="flex flex-col items-center justify-center gap-8 p-20">
       <Header currentUser={currentUser} />
 
-      <button type="button" onClick={signOut}>
+      <button type="button" className="text-foreground" onClick={signOut}>
         Log Out
       </button>
 
