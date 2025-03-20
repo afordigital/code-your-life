@@ -53,7 +53,7 @@ export default tseslint.config({
 });
 ```
 
-## Contributimg
+## Contributing
 
 <a href="https://github.com/afordigital/code-your-life/graphs/contributors">
 <img src="https://contrib.rocks/image?repo=afordigital/code-your-life"/>
