@@ -1,4 +1,41 @@
 :root {
+  --background: #f1f3f3;
+  --foreground: #0d0e0c;
+
+  --primary: #204d3d;
+  --primary-foreground: #f9fafa;
+
+  --secondary: #e9eae6;
+  --secondary-foreground: #0d0e0c;
+
+  --muted: #e8eae8;
+  --muted-foreground: #767d68;
+
+  --destructive: #ef4343;
+  --destructive-foreground: #fafafa;
+
+  --custom-black: #191919;
+}
+
+.dark {
+  --background: #000000;
+  --foreground: #fafafa;
+
+  --primary: #4abb93;
+  --primary-foreground: #fafafa;
+
+  --secondary: #0f0f0f;
+  --secondary-foreground: #fafafa;
+
+  --muted: #171717;
+  --muted-foreground: #7d7d7d;
+
+  --destructive: #ef4343;
+  --destructive-foreground: #fafafa;
+
+  --custom-black: #191919;
+}
+:root {
   --custom-black: #191919;
   --primary: #204d3d;
   --secondary: #b8e0d2;
@@ -58,7 +95,7 @@ body {
 }
 
 .bg-custom {
-  background-color: #fafafa;
+  background-color: var(--background);
   background-image: radial-gradient(#204d3d44 1px, transparent 0);
   background-size: 30px 30px;
 }
